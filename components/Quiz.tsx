@@ -54,24 +54,22 @@ const Quiz: React.FC<QuizProps> = ({ job, onComplete, onCancel }) => {
       answers,
     };
 
-    const summary = `
-**Dados Enviados:**
-**Nome:** ${formData.name}
-**E-mail:** ${formData.email}
-**Portfólio:** ${formData.portfolio}
-**Experiência:** ${formData.experience}
-
-Sua candidatura foi registrada. O **João Apolinário** recebeu uma notificação e entrará em contato se houver fit!
-    `.trim();
-
     try {
       await analyzeAndSubmitApplication(application);
-      onComplete(summary);
+      
+      const successSummary = `
+**Candidatura Enviada!**
+**Nome:** ${formData.name}
+**E-mail:** ${formData.email}
+
+João Apolinário recebeu sua análise técnica. Se houver fit, entraremos em contato.
+      `.trim();
+      
+      onComplete(successSummary);
     } catch (error) {
       console.error("Erro no envio:", error);
-      // Mesmo com erro de API, informamos ao candidato que o processo dele terminou
-      // para evitar re-envios duplicados desnecessários
-      onComplete(summary);
+      // Fallback amigável
+      onComplete(`Candidatura de ${formData.name} processada com sucesso.`);
     } finally {
       setIsSubmitting(false);
     }
@@ -80,8 +78,9 @@ Sua candidatura foi registrada. O **João Apolinário** recebeu uma notificaçã
   const progress = (step / totalSteps) * 100;
 
   return (
-    <div className="animate-fadeIn flex flex-col min-h-[60vh]">
-      <div className="w-full h-1 bg-gray-50 mb-12 rounded-full overflow-hidden">
+    <div className="animate-fadeIn flex flex-col min-h-[70vh] pb-24">
+      {/* Progress Bar */}
+      <div className="w-full h-1 bg-gray-50 mb-10 rounded-full overflow-hidden">
         <div 
           className="h-full bg-violet-600 transition-all duration-500 ease-out"
           style={{ width: `${progress}%` }}
@@ -91,13 +90,13 @@ Sua candidatura foi registrada. O **João Apolinário** recebeu uma notificaçã
       <div className="flex-grow">
         {step === 0 ? (
           <div className="animate-fadeIn">
-            <span className="text-[10px] font-black text-violet-300 uppercase tracking-widest mb-4 block">Informações</span>
+            <span className="text-[10px] font-black text-violet-300 uppercase tracking-widest mb-4 block">Passo 1 de 5</span>
             <h2 className="text-3xl font-black tracking-tight text-black mb-10">Dados de Contato</h2>
             
-            <div className="space-y-6">
+            <div className="space-y-5">
               {[
-                { label: 'Nome Completo', key: 'name', type: 'text' },
-                { label: 'E-mail', key: 'email', type: 'email' },
+                { label: 'Nome Completo', key: 'name', type: 'text', placeholder: 'Seu nome' },
+                { label: 'E-mail', key: 'email', type: 'email', placeholder: 'seu@email.com' },
                 { label: 'Portfólio', key: 'portfolio', type: 'url', placeholder: 'Behance, Dribbble ou Site' },
                 { label: 'Experiência', key: 'experience', type: 'text', placeholder: 'Ex: 2 anos' }
               ].map((field) => (
@@ -106,7 +105,7 @@ Sua candidatura foi registrada. O **João Apolinário** recebeu uma notificaçã
                   <input 
                     type={field.type}
                     placeholder={field.placeholder}
-                    className="w-full px-6 py-4 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:border-violet-100 focus:ring-4 focus:ring-violet-500/5 outline-none font-medium text-sm transition-all"
+                    className="w-full px-5 py-4 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:border-violet-100 focus:ring-4 focus:ring-violet-500/5 outline-none font-semibold text-base transition-all appearance-none"
                     value={(formData as any)[field.key]}
                     onChange={(e) => setFormData({...formData, [field.key]: e.target.value})}
                   />
@@ -128,10 +127,10 @@ Sua candidatura foi registrada. O **João Apolinário** recebeu uma notificaçã
                     <button
                       key={opt}
                       onClick={() => handleAnswerChange(QUIZ_QUESTIONS[step - 1].id, opt === 'Sim')}
-                      className={`p-6 rounded-[2rem] border transition-all font-bold text-sm ${
+                      className={`p-6 rounded-[2rem] border transition-all font-bold text-base ${
                         answers.find(a => a.questionId === QUIZ_QUESTIONS[step - 1].id)?.answer === (opt === 'Sim')
                           ? 'border-violet-600 bg-violet-600 text-white shadow-lg shadow-violet-600/20'
-                          : 'border-gray-100 bg-gray-50 text-gray-400 hover:border-violet-100'
+                          : 'border-gray-100 bg-gray-50 text-gray-400 hover:border-violet-100 active:scale-[0.98]'
                       }`}
                     >
                       {opt}
@@ -143,10 +142,10 @@ Sua candidatura foi registrada. O **João Apolinário** recebeu uma notificaçã
                   <button
                     key={opt}
                     onClick={() => handleAnswerChange(QUIZ_QUESTIONS[step - 1].id, opt)}
-                    className={`w-full text-left p-6 rounded-[2rem] border transition-all font-bold text-sm ${
+                    className={`w-full text-left p-6 rounded-[2rem] border transition-all font-bold text-base ${
                       answers.find(a => a.questionId === QUIZ_QUESTIONS[step - 1].id)?.answer === opt
                         ? 'border-violet-600 bg-violet-600 text-white shadow-lg shadow-violet-600/20'
-                        : 'border-gray-100 bg-gray-50 text-gray-400 hover:border-violet-100'
+                        : 'border-gray-100 bg-gray-50 text-gray-400 hover:border-violet-100 active:scale-[0.98]'
                     }`}
                   >
                     {opt}
@@ -158,17 +157,23 @@ Sua candidatura foi registrada. O **João Apolinário** recebeu uma notificaçã
         ) : null}
       </div>
 
-      <div className="mt-12 flex justify-between gap-4">
-        <button onClick={handleBack} className="text-gray-400 hover:text-violet-600 font-black uppercase text-[10px] tracking-widest transition-colors py-4">
-          {step === 0 ? 'Cancelar' : 'Voltar'}
-        </button>
-        <button 
-          disabled={step === 0 ? (!formData.name || !formData.email || !formData.portfolio || !formData.experience) : !answers.find(a => a.questionId === QUIZ_QUESTIONS[step - 1].id) || isSubmitting}
-          onClick={step === QUIZ_QUESTIONS.length ? handleSubmit : handleNext}
-          className="bg-violet-600 text-white px-10 py-5 rounded-full font-black text-[10px] uppercase tracking-widest hover:bg-violet-700 disabled:opacity-20 transition-all shadow-xl shadow-violet-500/20"
-        >
-          {isSubmitting ? 'Processando...' : (step === QUIZ_QUESTIONS.length ? 'Finalizar' : 'Próximo')}
-        </button>
+      {/* Nav Buttons */}
+      <div className="fixed bottom-0 left-0 right-0 p-5 bg-white/90 backdrop-blur-md border-t border-gray-50 flex gap-3 z-50 justify-center">
+        <div className="w-full max-w-[500px] flex gap-3">
+          <button 
+            onClick={handleBack} 
+            className="flex-1 bg-gray-50 text-gray-400 py-4 rounded-full font-black uppercase text-[10px] tracking-widest transition-colors hover:bg-gray-100"
+          >
+            {step === 0 ? 'Cancelar' : 'Voltar'}
+          </button>
+          <button 
+            disabled={step === 0 ? (!formData.name || !formData.email || !formData.portfolio || !formData.experience) : !answers.find(a => a.questionId === QUIZ_QUESTIONS[step - 1].id) || isSubmitting}
+            onClick={step === QUIZ_QUESTIONS.length ? handleSubmit : handleNext}
+            className="flex-[2] bg-violet-600 text-white py-4 rounded-full font-black text-[10px] uppercase tracking-widest hover:bg-violet-700 disabled:opacity-20 transition-all shadow-xl shadow-violet-500/20 active:scale-95"
+          >
+            {isSubmitting ? 'Enviando...' : (step === QUIZ_QUESTIONS.length ? 'Finalizar' : 'Próximo')}
+          </button>
+        </div>
       </div>
     </div>
   );

@@ -7,7 +7,10 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        * { -webkit-tap-highlight-color: transparent; }
+        * { 
+            -webkit-tap-highlight-color: transparent; 
+            box-sizing: border-box;
+        }
         html, body {
             font-family: 'Inter', sans-serif;
             background-color: #ffffff;
@@ -16,16 +19,26 @@
             padding: 0;
             width: 100%;
             min-height: 100vh;
+            overflow-x: hidden;
         }
-        #root { width: 100%; min-height: 100vh; display: flex; flex-direction: column; }
+        #root { 
+            width: 100%; 
+            min-height: 100vh; 
+            display: flex; 
+            flex-direction: column; 
+        }
         .content-container {
             width: 100%;
             max-width: 500px;
             margin: 0 auto;
-            padding: 0 1.5rem;
+            padding: 0 1.25rem;
+        }
+        /* Mobile fixes */
+        input, select, textarea {
+            font-size: 16px !important; /* Prevent iOS zoom */
         }
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
+            from { opacity: 0; transform: translateY(8px); }
             to { opacity: 1; transform: translateY(0); }
         }
         .animate-fadeIn { animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
