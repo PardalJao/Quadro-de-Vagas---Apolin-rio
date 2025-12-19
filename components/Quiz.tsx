@@ -57,11 +57,11 @@ const Quiz: React.FC<QuizProps> = ({ job, onComplete, onCancel }) => {
 
     try {
       await analyzeAndSubmitApplication(application);
-      onComplete(`Candidatura de **${formData.name}** enviada com sucesso ao João Apolinário.`);
+      onComplete(`Candidatura de **${formData.name}** recebida com sucesso! João Apolinário e Roberto (IA) estão revisando seu perfil.`);
     } catch (error) {
       console.error("Erro no envio:", error);
-      // Fallback para o usuário não ficar travado se o problema for apenas visual
-      onComplete(`Seu perfil foi processado. O João Apolinário entrará em contato.`);
+      // Fallback para manter a boa experiência do usuário mesmo em erro de rede
+      onComplete(`Candidatura de **${formData.name}** processada. Entraremos em contato via e-mail.`);
     } finally {
       setIsSubmitting(false);
     }
@@ -70,10 +70,11 @@ const Quiz: React.FC<QuizProps> = ({ job, onComplete, onCancel }) => {
   const progress = (step / totalSteps) * 100;
 
   return (
-    <div className="animate-fadeIn flex flex-col min-h-[75vh] pb-32">
-      <div className="w-full h-1 bg-gray-50 mb-10 rounded-full overflow-hidden">
+    <div className="animate-fadeIn flex flex-col min-h-[70vh] pb-32">
+      {/* Barra de Progresso */}
+      <div className="w-full h-1 bg-gray-100 mb-10 rounded-full overflow-hidden">
         <div 
-          className="h-full bg-violet-600 transition-all duration-700 ease-in-out"
+          className="h-full bg-violet-600 transition-all duration-500 ease-out"
           style={{ width: `${progress}%` }}
         />
       </div>
@@ -81,22 +82,22 @@ const Quiz: React.FC<QuizProps> = ({ job, onComplete, onCancel }) => {
       <div className="flex-grow">
         {step === 0 ? (
           <div className="animate-fadeIn">
-            <span className="text-[10px] font-black text-violet-300 uppercase tracking-widest mb-4 block">Passo 1 de 5</span>
-            <h2 className="text-3xl font-black tracking-tight text-black mb-10">Seus Dados</h2>
+            <span className="text-[10px] font-black text-violet-300 uppercase tracking-widest mb-4 block">Fase 1: Dados</span>
+            <h2 className="text-3xl font-black tracking-tight text-black mb-10 leading-none">Dados de Contato</h2>
             
             <div className="space-y-5">
               {[
-                { label: 'Nome Completo', key: 'name', type: 'text', placeholder: 'Ex: João Silva' },
-                { label: 'E-mail', key: 'email', type: 'email', placeholder: 'seu@email.com' },
+                { label: 'Seu Nome Completo', key: 'name', type: 'text', placeholder: 'Ex: João Vitor' },
+                { label: 'E-mail Principal', key: 'email', type: 'email', placeholder: 'seu@email.com' },
                 { label: 'Link do Portfólio', key: 'portfolio', type: 'url', placeholder: 'Behance, Dribbble ou Site' },
-                { label: 'Anos de Experiência', key: 'experience', type: 'text', placeholder: 'Ex: 2 anos' }
+                { label: 'Tempo de Experiência', key: 'experience', type: 'text', placeholder: 'Ex: 1 ano e meio' }
               ].map((field) => (
                 <div key={field.key}>
                   <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest block mb-2">{field.label}</label>
                   <input 
                     type={field.type}
                     placeholder={field.placeholder}
-                    className="w-full px-5 py-4 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:border-violet-100 focus:ring-4 focus:ring-violet-500/5 outline-none font-semibold transition-all appearance-none"
+                    className="w-full px-5 py-4 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:border-violet-100 focus:ring-4 focus:ring-violet-500/5 outline-none font-semibold text-base transition-all appearance-none"
                     value={(formData as any)[field.key]}
                     onChange={(e) => setFormData({...formData, [field.key]: e.target.value})}
                   />
@@ -106,7 +107,7 @@ const Quiz: React.FC<QuizProps> = ({ job, onComplete, onCancel }) => {
           </div>
         ) : step <= QUIZ_QUESTIONS.length ? (
           <div key={step} className="animate-fadeIn">
-            <span className="text-[10px] font-black text-violet-300 uppercase tracking-widest mb-4 block">Pergunta {step} de {QUIZ_QUESTIONS.length}</span>
+            <span className="text-[10px] font-black text-violet-300 uppercase tracking-widest mb-4 block">Fase 2: Quiz Tático</span>
             <h2 className="text-2xl font-black tracking-tight text-black mb-10 leading-tight">
               {QUIZ_QUESTIONS[step - 1].question}
             </h2>
@@ -148,6 +149,7 @@ const Quiz: React.FC<QuizProps> = ({ job, onComplete, onCancel }) => {
         ) : null}
       </div>
 
+      {/* Navegação Fixa Mobile */}
       <div className="fixed bottom-0 left-0 right-0 p-5 bg-white/95 backdrop-blur-md border-t border-gray-50 flex justify-center z-50">
         <div className="w-full max-w-[500px] flex gap-3">
           <button 

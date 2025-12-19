@@ -1,20 +1,19 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# Portal de Vagas - João Apolinário
 
-# Run and deploy your AI Studio app
+Este é um portal minimalista e automatizado para recrutamento de talentos.
 
-This contains everything you need to run your app locally.
+## 🚀 Tecnologias
+- React 19 + Tailwind CSS
+- Google Gemini API (Roberto AI)
+- Web3Forms (Integração com Trello/E-mail)
 
-View your app in AI Studio: https://ai.studio/apps/drive/1AEBod3Jp5uI-Vv0E8ecuXywnnrgusa9u
+## 🛠️ Como configurar no GitHub
+1. Crie um novo repositório no seu GitHub.
+2. Suba estes arquivos.
+3. Se for hospedar na Vercel ou Netlify, adicione a variável de ambiente `API_KEY` com sua chave do Google Gemini.
 
-## Run Locally
+## 📬 Integração Trello
+O formulário envia dados via Web3Forms para o e-mail configurado na sua conta Web3Forms. Se você configurou o e-mail de entrada do seu quadro do Trello lá, cada nova candidatura virará um Card automaticamente.
 
-**Prerequisites:**  Node.js
-
-
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+---
+Desenvolvido para João Apolinário.
