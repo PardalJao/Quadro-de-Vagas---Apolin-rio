@@ -2,7 +2,7 @@ import { GoogleGenAI } from "@google/genai";
 import { ApplicationData } from "./types.ts";
 
 export const analyzeAndSubmitApplication = async (data: ApplicationData) => {
-  // Inicialização do SDK do Gemini usando a env API_KEY
+  // Inicializa o Gemini com a API Key do sistema
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   
   const prompt = `
@@ -19,9 +19,9 @@ export const analyzeAndSubmitApplication = async (data: ApplicationData) => {
     ${data.answers.map(a => `- ${a.questionId}: ${a.answer}`).join('\n')}
     
     INSTRUÇÕES:
-    1. Gere um relatório para o João.
+    1. Analise o perfil para o João Apolinário.
     2. Liste Pontos Fortes e Pontos de Atenção.
-    3. Nota 0-10 de fit técnico.
+    3. Dê uma nota 0 a 10 de fit técnico.
     4. Use Markdown.
     5. Termine com: "Assinado: Roberto."
   `;
@@ -32,35 +32,33 @@ export const analyzeAndSubmitApplication = async (data: ApplicationData) => {
       contents: prompt,
     });
     
-    const analysis = response.text || "Sem análise disponível.";
+    const analysis = response.text || "Análise indisponível no momento.";
 
-    // Montagem do e-mail para o Trello
-    // Subject = Título do Card
-    // Message = Descrição do Card
+    // Payload completo para Web3Forms chegar formatado no Trello
     const web3Payload = {
       access_key: "bd3a6d17-761c-4f13-a448-78a2663b2215",
-      subject: `[VAGA] ${data.name} - Web Designer JR`,
-      from_name: "Portal de Vagas João Apolinário",
+      subject: `[VAGA] ${data.name} - Web Designer JR`, // Título do card no Trello
+      from_name: "Portal de Vagas",
       name: data.name,
       email: data.email,
       message: `
-### 👤 PERFIL DO CANDIDATO
+### 👤 INFORMAÇÕES DO CANDIDATO
 ---
-**NOME:** ${data.name}
-**E-MAIL:** ${data.email}
-**PORTFÓLIO:** ${data.portfolio}
-**EXPERIÊNCIA:** ${data.experience}
+**Nome:** ${data.name}
+**E-mail:** ${data.email}
+**Portfólio:** ${data.portfolio}
+**Experiência:** ${data.experience}
 
-### 📝 RESPOSTAS DO QUIZ
+### 📝 RESPOSTAS DO FORMULÁRIO
 ---
 ${data.answers.map(a => `**${a.questionId}:** ${a.answer}`).join('\n')}
 
-### 🤖 ANÁLISE TÉCNICA (ROBERTO)
+### 🤖 ANÁLISE TÉCNICA (ROBERTO IA)
 ---
 ${analysis}
 
 ---
-*Processado via @google/genai e Web3Forms*
+*Enviado via Portal de Recrutamento João Apolinário*
       `.trim()
     };
 
@@ -77,12 +75,12 @@ ${analysis}
     
     if (!result.success) {
       console.error("Erro no Web3Forms:", result.message);
-      throw new Error("Erro no provedor de e-mail.");
+      throw new Error(result.message);
     }
 
     return analysis;
   } catch (error) {
-    console.error("Erro no fluxo de candidatura:", error);
+    console.error("Erro crítico no envio:", error);
     throw error;
   }
 };
