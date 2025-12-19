@@ -42,6 +42,7 @@ const Quiz: React.FC<QuizProps> = ({ job, onComplete, onCancel }) => {
   };
 
   const handleSubmit = async () => {
+    if (isSubmitting) return;
     setIsSubmitting(true);
     
     const application: ApplicationData = {
@@ -56,20 +57,10 @@ const Quiz: React.FC<QuizProps> = ({ job, onComplete, onCancel }) => {
 
     try {
       await analyzeAndSubmitApplication(application);
-      
-      const successSummary = `
-**Candidatura Enviada!**
-**Nome:** ${formData.name}
-**E-mail:** ${formData.email}
-
-João Apolinário recebeu sua análise técnica. Se houver fit, entraremos em contato.
-      `.trim();
-      
-      onComplete(successSummary);
+      onComplete(`Candidatura de ${formData.name} enviada com sucesso ao João Apolinário.`);
     } catch (error) {
-      console.error("Erro no envio:", error);
-      // Fallback amigável
-      onComplete(`Candidatura de ${formData.name} processada com sucesso.`);
+      console.error("Falha no envio:", error);
+      onComplete(`Candidatura registrada. O João Apolinário entrará em contato em breve.`);
     } finally {
       setIsSubmitting(false);
     }
@@ -78,11 +69,11 @@ João Apolinário recebeu sua análise técnica. Se houver fit, entraremos em co
   const progress = (step / totalSteps) * 100;
 
   return (
-    <div className="animate-fadeIn flex flex-col min-h-[70vh] pb-24">
-      {/* Progress Bar */}
+    <div className="animate-fadeIn flex flex-col min-h-[75vh] pb-32">
+      {/* Barra de Progresso Minimalista */}
       <div className="w-full h-1 bg-gray-50 mb-10 rounded-full overflow-hidden">
         <div 
-          className="h-full bg-violet-600 transition-all duration-500 ease-out"
+          className="h-full bg-violet-600 transition-all duration-700 ease-in-out"
           style={{ width: `${progress}%` }}
         />
       </div>
@@ -90,22 +81,22 @@ João Apolinário recebeu sua análise técnica. Se houver fit, entraremos em co
       <div className="flex-grow">
         {step === 0 ? (
           <div className="animate-fadeIn">
-            <span className="text-[10px] font-black text-violet-300 uppercase tracking-widest mb-4 block">Passo 1 de 5</span>
+            <span className="text-[10px] font-black text-violet-300 uppercase tracking-widest mb-4 block">Identificação</span>
             <h2 className="text-3xl font-black tracking-tight text-black mb-10">Dados de Contato</h2>
             
             <div className="space-y-5">
               {[
-                { label: 'Nome Completo', key: 'name', type: 'text', placeholder: 'Seu nome' },
+                { label: 'Nome Completo', key: 'name', type: 'text', placeholder: 'Como quer ser chamado?' },
                 { label: 'E-mail', key: 'email', type: 'email', placeholder: 'seu@email.com' },
-                { label: 'Portfólio', key: 'portfolio', type: 'url', placeholder: 'Behance, Dribbble ou Site' },
-                { label: 'Experiência', key: 'experience', type: 'text', placeholder: 'Ex: 2 anos' }
+                { label: 'Portfólio', key: 'portfolio', type: 'url', placeholder: 'Behance, Dribbble ou Link' },
+                { label: 'Experiência', key: 'experience', type: 'text', placeholder: 'Quanto tempo de área?' }
               ].map((field) => (
                 <div key={field.key}>
                   <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest block mb-2">{field.label}</label>
                   <input 
                     type={field.type}
                     placeholder={field.placeholder}
-                    className="w-full px-5 py-4 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:border-violet-100 focus:ring-4 focus:ring-violet-500/5 outline-none font-semibold text-base transition-all appearance-none"
+                    className="w-full px-5 py-4 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:border-violet-100 focus:ring-4 focus:ring-violet-500/5 outline-none font-semibold transition-all appearance-none"
                     value={(formData as any)[field.key]}
                     onChange={(e) => setFormData({...formData, [field.key]: e.target.value})}
                   />
@@ -115,7 +106,7 @@ João Apolinário recebeu sua análise técnica. Se houver fit, entraremos em co
           </div>
         ) : step <= QUIZ_QUESTIONS.length ? (
           <div key={step} className="animate-fadeIn">
-            <span className="text-[10px] font-black text-violet-300 uppercase tracking-widest mb-4 block">Pergunta {step} de {QUIZ_QUESTIONS.length}</span>
+            <span className="text-[10px] font-black text-violet-300 uppercase tracking-widest mb-4 block">Questionário</span>
             <h2 className="text-2xl font-black tracking-tight text-black mb-10 leading-tight">
               {QUIZ_QUESTIONS[step - 1].question}
             </h2>
@@ -130,7 +121,7 @@ João Apolinário recebeu sua análise técnica. Se houver fit, entraremos em co
                       className={`p-6 rounded-[2rem] border transition-all font-bold text-base ${
                         answers.find(a => a.questionId === QUIZ_QUESTIONS[step - 1].id)?.answer === (opt === 'Sim')
                           ? 'border-violet-600 bg-violet-600 text-white shadow-lg shadow-violet-600/20'
-                          : 'border-gray-100 bg-gray-50 text-gray-400 hover:border-violet-100 active:scale-[0.98]'
+                          : 'border-gray-100 bg-gray-50 text-gray-400 hover:border-violet-100 active:scale-95'
                       }`}
                     >
                       {opt}
@@ -145,7 +136,7 @@ João Apolinário recebeu sua análise técnica. Se houver fit, entraremos em co
                     className={`w-full text-left p-6 rounded-[2rem] border transition-all font-bold text-base ${
                       answers.find(a => a.questionId === QUIZ_QUESTIONS[step - 1].id)?.answer === opt
                         ? 'border-violet-600 bg-violet-600 text-white shadow-lg shadow-violet-600/20'
-                        : 'border-gray-100 bg-gray-50 text-gray-400 hover:border-violet-100 active:scale-[0.98]'
+                        : 'border-gray-100 bg-gray-50 text-gray-400 hover:border-violet-100 active:scale-95'
                     }`}
                   >
                     {opt}
@@ -157,12 +148,12 @@ João Apolinário recebeu sua análise técnica. Se houver fit, entraremos em co
         ) : null}
       </div>
 
-      {/* Nav Buttons */}
-      <div className="fixed bottom-0 left-0 right-0 p-5 bg-white/90 backdrop-blur-md border-t border-gray-50 flex gap-3 z-50 justify-center">
+      {/* Navegação Fixa Mobile-Friendly */}
+      <div className="fixed bottom-0 left-0 right-0 p-5 bg-white/95 backdrop-blur-md border-t border-gray-50 flex justify-center z-50">
         <div className="w-full max-w-[500px] flex gap-3">
           <button 
             onClick={handleBack} 
-            className="flex-1 bg-gray-50 text-gray-400 py-4 rounded-full font-black uppercase text-[10px] tracking-widest transition-colors hover:bg-gray-100"
+            className="flex-1 bg-gray-50 text-gray-400 py-4 rounded-full font-black uppercase text-[10px] tracking-widest transition-all hover:bg-gray-100 active:scale-95"
           >
             {step === 0 ? 'Cancelar' : 'Voltar'}
           </button>
@@ -171,7 +162,7 @@ João Apolinário recebeu sua análise técnica. Se houver fit, entraremos em co
             onClick={step === QUIZ_QUESTIONS.length ? handleSubmit : handleNext}
             className="flex-[2] bg-violet-600 text-white py-4 rounded-full font-black text-[10px] uppercase tracking-widest hover:bg-violet-700 disabled:opacity-20 transition-all shadow-xl shadow-violet-500/20 active:scale-95"
           >
-            {isSubmitting ? 'Enviando...' : (step === QUIZ_QUESTIONS.length ? 'Finalizar' : 'Próximo')}
+            {isSubmitting ? 'Finalizando...' : (step === QUIZ_QUESTIONS.length ? 'Finalizar' : 'Próximo')}
           </button>
         </div>
       </div>

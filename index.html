@@ -20,6 +20,7 @@
             width: 100%;
             min-height: 100vh;
             overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
         }
         #root { 
             width: 100%; 
@@ -33,12 +34,11 @@
             margin: 0 auto;
             padding: 0 1.25rem;
         }
-        /* Mobile fixes */
-        input, select, textarea {
-            font-size: 16px !important; /* Prevent iOS zoom */
+        input, select, textarea, button {
+            font-size: 16px !important; /* Previne zoom no iOS */
         }
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(8px); }
+            from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
         .animate-fadeIn { animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
