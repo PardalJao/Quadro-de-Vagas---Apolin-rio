@@ -1,9 +1,8 @@
 import { GoogleGenAI } from "@google/genai";
-import { ApplicationData } from "./types";
+import { ApplicationData } from "./types.ts";
 
 const getApiKey = () => {
   try {
-    // Verifica se process e process.env existem antes de acessar
     if (typeof process !== 'undefined' && process.env && process.env.API_KEY) {
       return process.env.API_KEY;
     }
@@ -18,10 +17,6 @@ const WEBHOOK_URL = "/api/webhook";
 export const analyzeAndSubmitApplication = async (data: ApplicationData) => {
   const apiKey = getApiKey();
   
-  if (!apiKey) {
-    console.error("API_KEY não encontrada. Verifique as variáveis de ambiente na Vercel.");
-  }
-
   const ai = new GoogleGenAI({ apiKey });
   
   const prompt = `
@@ -41,7 +36,7 @@ export const analyzeAndSubmitApplication = async (data: ApplicationData) => {
     1. Gere um relatório técnico detalhado.
     2. Liste **Pontos Fortes** e **Pontos de Atenção**.
     3. Dê uma nota de 0 a 10 para o fit técnico.
-    4. Formate com **negritos** para facilitar a leitura no Trello.
+    4. Formate com **negritos** para facilitar a leitura.
     5. Termine com: "Assinado: Roberto."
   `;
 
@@ -65,13 +60,9 @@ export const analyzeAndSubmitApplication = async (data: ApplicationData) => {
       })
     });
 
-    if (!res.ok) {
-        console.warn("O webhook falhou, mas a análise foi gerada.");
-    }
-    
     return analysis;
   } catch (error) {
     console.error("Erro no processamento:", error);
-    return "Candidatura enviada para processamento. Em breve você receberá um retorno.";
+    return "Candidatura enviada. Em breve você receberá um retorno.";
   }
 };

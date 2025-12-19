@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { QUIZ_QUESTIONS } from '../constants';
-import { Job, ApplicationData, QuizAnswer } from '../types';
-import { analyzeAndSubmitApplication } from '../geminiService';
+import { QUIZ_QUESTIONS } from '../constants.tsx';
+import { Job, ApplicationData, QuizAnswer } from '../types.ts';
+import { analyzeAndSubmitApplication } from '../geminiService.ts';
 
 interface QuizProps {
   job: Job;
@@ -61,7 +61,7 @@ const Quiz: React.FC<QuizProps> = ({ job, onComplete, onCancel }) => {
 **Portfólio:** ${formData.portfolio}
 **Experiência:** ${formData.experience}
 
-Sua candidatura foi registrada. O **João Apolinário** recebeu uma notificação no Trello. Entraremos em contato se houver fit!
+Sua candidatura foi registrada e recebida por **João Apolinário**. Entraremos em contato se houver fit!
     `.trim();
 
     try {
