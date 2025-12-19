@@ -69,7 +69,7 @@ Sua candidatura foi registrada e recebida por **João Apolinário**. Entraremos 
       onComplete(summary);
     } catch (error) {
       console.error("Erro no envio:", error);
-      onComplete("Ocorreu um erro no processamento automático, mas seus dados foram salvos para backup.");
+      onComplete(summary); // Mostra o resumo mesmo se o webhook falhar (backup)
     } finally {
       setIsSubmitting(false);
     }

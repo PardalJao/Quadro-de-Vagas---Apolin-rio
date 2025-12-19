@@ -16,7 +16,6 @@ const WEBHOOK_URL = "/api/webhook";
 
 export const analyzeAndSubmitApplication = async (data: ApplicationData) => {
   const apiKey = getApiKey();
-  
   const ai = new GoogleGenAI({ apiKey });
   
   const prompt = `
@@ -33,7 +32,7 @@ export const analyzeAndSubmitApplication = async (data: ApplicationData) => {
     ${data.answers.map(a => `- ${a.questionId}: ${a.answer}`).join('\n')}
     
     INSTRUÇÕES:
-    1. Gere um relatório técnico detalhado.
+    1. Gere um relatório técnico detalhado para o João Apolinário.
     2. Liste **Pontos Fortes** e **Pontos de Atenção**.
     3. Dê uma nota de 0 a 10 para o fit técnico.
     4. Formate com **negritos** para facilitar a leitura.
@@ -48,7 +47,8 @@ export const analyzeAndSubmitApplication = async (data: ApplicationData) => {
     
     const analysis = response.text || "Análise não disponível.";
 
-    const res = await fetch(WEBHOOK_URL, {
+    // Dispara para o backend que enviará o e-mail para o Trello
+    await fetch(WEBHOOK_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -63,6 +63,6 @@ export const analyzeAndSubmitApplication = async (data: ApplicationData) => {
     return analysis;
   } catch (error) {
     console.error("Erro no processamento:", error);
-    return "Candidatura enviada. Em breve você receberá um retorno.";
+    return "Candidatura registrada.";
   }
 };
