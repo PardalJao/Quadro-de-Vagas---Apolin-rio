@@ -69,7 +69,8 @@ Sua candidatura foi registrada. O **João Apolinário** recebeu uma notificaçã
       onComplete(summary);
     } catch (error) {
       console.error("Erro no envio:", error);
-      onComplete(summary); // Backup: exibe sucesso pois os dados foram processados localmente
+      // Exibimos o sucesso parcial (o candidato terminou o fluxo) mesmo em caso de erro na API
+      onComplete(summary);
     } finally {
       setIsSubmitting(false);
     }
