@@ -2,10 +2,25 @@
 import { GoogleGenAI } from "@google/genai";
 import { ApplicationData } from "./types";
 
+// Helper para acessar a API Key com segurança no ambiente de execução
+const getApiKey = () => {
+  try {
+    return process.env.API_KEY || "";
+  } catch (e) {
+    return "";
+  }
+};
+
 const WEBHOOK_URL = "/api/webhook"; 
 
 export const analyzeAndSubmitApplication = async (data: ApplicationData) => {
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  const apiKey = getApiKey();
+  
+  if (!apiKey) {
+    console.error("API_KEY não encontrada no ambiente.");
+  }
+
+  const ai = new GoogleGenAI({ apiKey });
   
   const prompt = `
     VOCÊ É O ROBERTO, ASSISTENTE TÉCNICO DE JOÃO APOLINÁRIO.
@@ -36,7 +51,7 @@ export const analyzeAndSubmitApplication = async (data: ApplicationData) => {
     
     const analysis = response.text || "Análise não disponível.";
 
-    // Envio para a nossa API Python no Vercel
+    // Dispara para o nosso backend que cuida do envio de e-mail/Trello
     const res = await fetch(WEBHOOK_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -49,11 +64,13 @@ export const analyzeAndSubmitApplication = async (data: ApplicationData) => {
       })
     });
 
-    if (!res.ok) throw new Error("Falha no disparo do e-mail");
+    if (!res.ok) {
+        console.warn("O webhook falhou, mas a análise foi gerada.");
+    }
     
     return analysis;
   } catch (error) {
     console.error("Erro no processamento:", error);
-    return null;
+    return "Erro ao processar candidatura. Por favor, tente novamente.";
   }
 };

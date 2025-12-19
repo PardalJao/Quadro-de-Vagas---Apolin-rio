@@ -1,2 +1,2 @@
 
-# Nenhuma dependência externa necessária (usamos smtplib padrão)
+# Nenhuma biblioteca externa necessária para smtplib e http.server
