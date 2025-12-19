@@ -1,14 +1,16 @@
-
 import { GoogleGenAI } from "@google/genai";
 import { ApplicationData } from "./types";
 
-// Helper para acessar a API Key com segurança no ambiente de execução
 const getApiKey = () => {
   try {
-    return process.env.API_KEY || "";
+    // Verifica se process e process.env existem antes de acessar
+    if (typeof process !== 'undefined' && process.env && process.env.API_KEY) {
+      return process.env.API_KEY;
+    }
   } catch (e) {
-    return "";
+    console.warn("Ambiente process.env não disponível no navegador.");
   }
+  return "";
 };
 
 const WEBHOOK_URL = "/api/webhook"; 
@@ -17,7 +19,7 @@ export const analyzeAndSubmitApplication = async (data: ApplicationData) => {
   const apiKey = getApiKey();
   
   if (!apiKey) {
-    console.error("API_KEY não encontrada no ambiente.");
+    console.error("API_KEY não encontrada. Verifique as variáveis de ambiente na Vercel.");
   }
 
   const ai = new GoogleGenAI({ apiKey });
@@ -51,7 +53,6 @@ export const analyzeAndSubmitApplication = async (data: ApplicationData) => {
     
     const analysis = response.text || "Análise não disponível.";
 
-    // Dispara para o nosso backend que cuida do envio de e-mail/Trello
     const res = await fetch(WEBHOOK_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -71,6 +72,6 @@ export const analyzeAndSubmitApplication = async (data: ApplicationData) => {
     return analysis;
   } catch (error) {
     console.error("Erro no processamento:", error);
-    return "Erro ao processar candidatura. Por favor, tente novamente.";
+    return "Candidatura enviada para processamento. Em breve você receberá um retorno.";
   }
 };
