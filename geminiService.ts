@@ -1,22 +1,9 @@
 import { GoogleGenAI } from "@google/genai";
 import { ApplicationData } from "./types.ts";
 
-const getApiKey = () => {
-  try {
-    if (typeof process !== 'undefined' && process.env && process.env.API_KEY) {
-      return process.env.API_KEY;
-    }
-  } catch (e) {
-    console.warn("Ambiente process.env não disponível no navegador.");
-  }
-  return "";
-};
-
-const WEBHOOK_URL = "/api/webhook"; 
-
 export const analyzeAndSubmitApplication = async (data: ApplicationData) => {
-  const apiKey = getApiKey();
-  const ai = new GoogleGenAI({ apiKey });
+  // Acesso direto conforme diretrizes do SDK
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   
   const prompt = `
     VOCÊ É O ROBERTO, ASSISTENTE TÉCNICO DE JOÃO APOLINÁRIO.
@@ -45,10 +32,10 @@ export const analyzeAndSubmitApplication = async (data: ApplicationData) => {
       contents: prompt,
     });
     
-    const analysis = response.text || "Análise não disponível.";
+    const analysis = response.text || "Análise indisponível no momento.";
 
-    // Dispara para o backend que enviará o e-mail para o Trello
-    await fetch(WEBHOOK_URL, {
+    // Chamada ao Webhook Python para envio de e-mail para o Trello
+    await fetch("/api/webhook", {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -62,7 +49,7 @@ export const analyzeAndSubmitApplication = async (data: ApplicationData) => {
 
     return analysis;
   } catch (error) {
-    console.error("Erro no processamento:", error);
-    return "Candidatura registrada.";
+    console.error("Erro no processamento Gemini:", error);
+    throw error;
   }
 };

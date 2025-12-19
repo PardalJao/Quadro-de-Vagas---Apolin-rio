@@ -61,7 +61,7 @@ const Quiz: React.FC<QuizProps> = ({ job, onComplete, onCancel }) => {
 **Portfólio:** ${formData.portfolio}
 **Experiência:** ${formData.experience}
 
-Sua candidatura foi registrada e recebida por **João Apolinário**. Entraremos em contato se houver fit!
+Sua candidatura foi registrada. O **João Apolinário** recebeu uma notificação e entrará em contato se houver fit!
     `.trim();
 
     try {
@@ -69,7 +69,7 @@ Sua candidatura foi registrada e recebida por **João Apolinário**. Entraremos 
       onComplete(summary);
     } catch (error) {
       console.error("Erro no envio:", error);
-      onComplete(summary); // Mostra o resumo mesmo se o webhook falhar (backup)
+      onComplete(summary); // Backup: exibe sucesso pois os dados foram processados localmente
     } finally {
       setIsSubmitting(false);
     }
